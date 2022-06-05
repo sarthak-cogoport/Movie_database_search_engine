@@ -4,6 +4,29 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+
+  }
+.main{
+  margin-top: 80px;
+}
+
+.search{
+  margin-top: 30px;
+}
+
+.top-container{
+  text-align: center;
+}
+
+.movie-list{
+  margin-top: 100px;
+}
+
+.movie-page{
+  margin-top: 50px;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
 }
 
 a {

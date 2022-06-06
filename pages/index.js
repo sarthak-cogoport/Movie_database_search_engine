@@ -5,28 +5,39 @@ import axios from "axios";
 import { useState } from "react";
 import Link from "next/link";
 import { MovieList } from "./MovieList";
-import list from './movieList.json';
+import list from "./movieList.json";
 
 export default function Home() {
-  const [movieName, setMovieName] = useState(null);
+  const [movieName, setMovieName] = useState("");
   const [movieInfo, setMovieInfo] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isErr, setIsError] = useState(false)
 
   let details = JSON.parse(JSON.stringify(list));
 
-
-
   const fetchMovieInfo = () => {
+    
     try {
+      setIsLoading(true);
       axios
         .get(`https://www.omdbapi.com/?apikey=3400aa2e&s=${movieName}`)
         .then((response) => {
           let result = JSON.parse(JSON.stringify(response));
+          if(result.data.Response==="False")
+          {
+            setIsError(true);
+            setIsLoading(false);
+            return;
+          }
+          setIsError(false);
           const { data } = result;
           const { Search } = data;
           setMovieInfo(Search);
+          setIsLoading(false);
         });
     } catch (err) {
       console.log(err);
+      setIsLoading(false);
     }
   };
 
@@ -34,21 +45,42 @@ export default function Home() {
     <div className="container main">
       <div className="container-sm top-container">
         <h2>Movie Database App</h2>
-
-        <input
-        className="search"
-          type="text"
-          placeholder="Search for any movie..."
-          onChange={(e) => setMovieName(e.target.value)}
-        />
-        <button href="#" type="submit" onClick={fetchMovieInfo}>
-          Search
-        </button>
+        <div className="input-group mb-3 search">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search for any movie..."
+            aria-label="Recipient's username"
+            aria-describedby="button-addon2"
+            onChange={(e) => setMovieName(e.target.value)}
+          />
+        </div>
+        <button
+            className="btn btn-outline-success "
+            type="button"
+            id="button-addon2"
+            onClick={fetchMovieInfo}
+            disabled={movieName===""?true:false}
+          >
+            Search
+          </button>
+          <Link href={'/'}>
+              <a>
+                <button style={{marginLeft:"10px"}} type="button" className="btn btn-outline-light">
+                  Home
+                </button>
+              </a>
+            </Link>
       </div>
+      {isLoading?<p className="loading">Loading...</p>:null}
+      {isErr?<p className="loading">Movie not found. Please search again.</p>:null}
       <div>
-        {movieInfo ?<MovieList details={movieInfo}/>:<MovieList details={list} />}
+        {movieInfo ? (
+          <MovieList details={movieInfo} />
+        ) : (
+          <MovieList details={list} />
+        )}
       </div>
-      
     </div>
   );
 }

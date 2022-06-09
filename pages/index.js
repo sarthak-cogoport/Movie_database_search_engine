@@ -2,18 +2,20 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import axios from "axios";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import Link from "next/link";
 import { MovieList } from "./MovieList";
 import list from "./movieList.json";
+
 
 export default function Home() {
   const [movieName, setMovieName] = useState("");
   const [movieInfo, setMovieInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isErr, setIsError] = useState(false)
+  const [films,setFilms] = useState([])
 
-  let details = JSON.parse(JSON.stringify(list));
+  
 
   const fetchMovieInfo = () => {
     
@@ -40,6 +42,30 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+
+  const fetchFilmDetails = () =>{
+    try {
+      axios
+        .get("http://127.0.0.1:3000/movie/all",{
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        })
+        .then((response) => {
+          let result =JSON.parse(JSON.stringify(response));
+          let {data} = result
+          console.log(data)
+          setFilms(data);
+          
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  useEffect(()=>{
+    fetchFilmDetails();
+  },[])
 
   return (
     <div className="container main">
@@ -78,8 +104,9 @@ export default function Home() {
         {movieInfo ? (
           <MovieList details={movieInfo} />
         ) : (
-          <MovieList details={list} />
+          <MovieList details={films}/>
         )}
+        
       </div>
     </div>
   );
